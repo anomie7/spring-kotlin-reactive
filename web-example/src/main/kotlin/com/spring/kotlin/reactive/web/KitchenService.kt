@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 // tag::code[]
-package com.springkotlinreactive
+package com.spring.kotlin.reactive.web
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux

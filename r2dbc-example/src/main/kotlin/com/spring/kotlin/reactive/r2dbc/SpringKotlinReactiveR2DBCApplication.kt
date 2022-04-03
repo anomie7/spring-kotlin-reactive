@@ -1,11 +1,11 @@
-package com.springkotlinreactive
+package com.spring.kotlin.reactive.r2dbc
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class SpringKotlinReactiveApplication
+class SpringKotlinReactiveR2DBCApplication
 
 fun main(args: Array<String>) {
-	runApplication<SpringKotlinReactiveApplication>(*args)
+	runApplication<SpringKotlinReactiveR2DBCApplication>(*args)
 }

@@ -13,9 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.springkotlinreactive
+// tag::dish[]
+package com.spring.kotlin.reactive.web
 
-/**
- * @author Greg Turnquist
- */
-class Cart 
+import com.spring.kotlin.reactive.web.Dish
+
+class Dish(var description: String) {
+    var isDelivered = false
+        private set
+
+    override fun toString(): String {
+        return "Dish{" +  //
+                "description='" + description + '\'' +  //
+                ", delivered=" + isDelivered +  //
+                '}'
+    }
+
+    companion object {
+        fun deliver(dish: Dish): Dish {
+            val deliveredDish = Dish(dish.description)
+            deliveredDish.isDelivered = true
+            return deliveredDish
+        }
+    }
+}

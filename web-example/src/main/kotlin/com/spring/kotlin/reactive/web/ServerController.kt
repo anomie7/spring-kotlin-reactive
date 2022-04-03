@@ -1,10 +1,9 @@
-package com.springkotlinreactive
+package com.spring.kotlin.reactive.web
 
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
-import java.util.function.Function
 
 @RestController
 class ServerController(private val kitchen: KitchenService) {
