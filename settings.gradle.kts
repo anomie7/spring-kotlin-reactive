@@ -1,2 +1,2 @@
 rootProject.name = "spring-kotlin-reactive"
-include("test-ch1")
+include("web-example")
