@@ -7,3 +7,6 @@
 - https://github.com/hantsy/spring-r2dbc-sample
 - https://github.com/spring-projects/spring-data-examples/tree/main/r2dbc
 - https://r2dbc.io/spec/0.8.1.RELEASE/spec/html/#datatypes.mapping
+
+## 연관관계 구현, CustomRepository
+- https://heesutory.tistory.com/34?category=901813

@@ -3,6 +3,10 @@ spring:
     url: r2dbc:h2:mem:///test
     username: sa
     password:
+  webflux:
+    hiddenmethod:
+      filter:
+        enabled: true
 logging:
   level:
     org:

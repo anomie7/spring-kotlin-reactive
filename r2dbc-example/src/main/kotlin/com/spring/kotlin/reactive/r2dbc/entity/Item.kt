@@ -1,4 +1,4 @@
-package com.spring.kotlin.reactive.r2dbc
+package com.spring.kotlin.reactive.r2dbc.entity
 
 import org.springframework.data.annotation.Id
 
