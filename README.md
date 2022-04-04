@@ -10,3 +10,6 @@
 
 ## 연관관계 구현, CustomRepository
 - https://heesutory.tistory.com/34?category=901813
+
+## kotlin에서 @Transient 안먹는 이슈
+- https://github.com/spring-projects/spring-data-r2dbc/issues/449

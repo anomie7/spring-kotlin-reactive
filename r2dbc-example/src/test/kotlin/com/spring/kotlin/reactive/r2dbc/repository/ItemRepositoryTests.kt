@@ -1,4 +1,4 @@
-package com.spring.kotlin.reactive.r2dbc
+package com.spring.kotlin.reactive.r2dbc.repository
 
 import com.spring.kotlin.reactive.r2dbc.entity.Item
 import com.spring.kotlin.reactive.r2dbc.repository.ItemRepository
