@@ -1,10 +1,11 @@
 package com.spring.kotlin.reactive.r2dbc.repository
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.r2dbc.core.DatabaseClient
+import reactor.test.StepVerifier
 
 @SpringBootTest
 class CartRepositoryTest {
@@ -12,7 +13,7 @@ class CartRepositoryTest {
     private lateinit var cartRepository: CartRepository
 
     @Autowired
-    private lateinit var  dataBaseClient: DatabaseClient
+    private lateinit var dataBaseClient: DatabaseClient
 
     @Test
     fun getAllTest() {
@@ -30,14 +31,22 @@ class CartRepositoryTest {
 
     @Test
     fun findAllTest() {
-        val carts = cartRepository.findAll()
+        cartRepository.findAll()
+            .`as`(StepVerifier::create)
+            .expectNextMatches {
+                Assertions.assertNotNull(it)
+                true
+            }.verifyComplete()
+    }
 
-        carts.collectMap {
-            it.id
-        }.map {
-            val keys = it.keys
-            keys
-        }
-
+    @Test
+    fun getCartItemTest() {
+        cartRepository.getById(1)
+            .`as`(StepVerifier::create)
+            .expectNextMatches{
+                Assertions.assertEquals(1, it.id)
+                Assertions.assertNotNull(it.cartItems)
+                true
+            }.verifyComplete()
     }
 }
