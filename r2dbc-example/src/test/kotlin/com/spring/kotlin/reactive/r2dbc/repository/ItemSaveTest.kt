@@ -1,15 +1,13 @@
 package com.spring.kotlin.reactive.r2dbc.repository
 
-import com.spring.kotlin.reactive.r2dbc.entity.Cart
 import com.spring.kotlin.reactive.r2dbc.entity.Item
-import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
+import io.r2dbc.spi.Result
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.data.r2dbc.core.insert
 import org.springframework.r2dbc.core.DatabaseClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -71,35 +69,31 @@ class ItemSaveTest {
             .verifyComplete()
     }
 
-//    @Test
-//    fun batchSaveTest() {
-//        val id1 = 999L
-//        val id2 = 998L
-//        Mono.from(connectionFactory.create())
-//            .flatMapMany { connection ->
-//                Flux.from(
-//                    connection
-//                        .createBatch()
-//                        .add("INSERT INTO item(id, name, price) VALUES ($id1, '테스트 아티템 15', 22.99)")
-//                        .add("INSERT INTO item(id, name, price) VALUES ($id2, '테스트 아티템 15', 22.99)")
-//                        .execute()
-//                )
-//            }.then()
-//            .`as`(StepVerifier::create)
-//            .verifyComplete()
-//    }
+    @Test
+    fun batchSaveTest() {
+        val item1 = Item(name = "배치 아이템1", price = 101.0)
+        val item2 = Item(name = "배치 아이템2", price = 141.0)
+        batchSave(listOf(item1, item2))
+            .`as`(StepVerifier::create)
+            .thenConsumeWhile {
+                println("item save success: $it")
+                true
+            }.verifyComplete()
+    }
 
-    fun a() {
-        val id1 = 999L
-        val id2 = 998L
-        Mono.from(connectionFactory.create())
-            .flatMapMany { connection ->
-                Flux.from(
-                    connection
-                        .createBatch()
-                        .add("INSERT INTO item(id, name, price) VALUES ($id1, '테스트 아티템 15', 22.99)")
-                        .add("INSERT INTO item(id, name, price) VALUES ($id2, '테스트 아티템 15', 22.99)")
-                        .execute())
-            }.then()
+    fun batchSave(items: List<Item>): Flux<Item> {
+        return dataBaseClient.inConnectionMany { connection ->
+            val statement =
+                connection.createStatement("INSERT INTO item(name, price) VALUES ($1, $2)")
+                    .returnGeneratedValues("id", "name", "price")
+            for (item in items) {
+                statement.bind(0, item.name).bind(1, item.price).add()
+            }
+            Flux.from(statement.execute()).flatMap { result ->
+                result.map { t, r ->
+                    Item(t["id"] as Long, t["name"] as String, t["price"] as Double)
+                }
+            }
+        }
     }
 }
