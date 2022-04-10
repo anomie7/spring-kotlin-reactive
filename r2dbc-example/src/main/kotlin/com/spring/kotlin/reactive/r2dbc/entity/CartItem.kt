@@ -17,4 +17,8 @@ data class CartItem(
     @Transient
     @Value("null")
     var item: Item? = null
-)
+) {
+    fun increment() {
+        this.quantity += 1
+    }
+}
