@@ -3,11 +3,17 @@ package com.spring.kotlin.reactive.r2dbc.repository
 import com.spring.kotlin.reactive.r2dbc.entity.Cart
 import com.spring.kotlin.reactive.r2dbc.entity.CartItem
 import com.spring.kotlin.reactive.r2dbc.entity.Item
+import io.r2dbc.spi.ConnectionFactory
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.repository.Query
+import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Update
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import java.lang.RuntimeException
 import java.util.stream.Collectors
 
 @Repository
@@ -19,10 +25,16 @@ interface CartRepository : ReactiveCrudRepository<Cart, Long>, CartCustomReposit
 interface CartCustomRepository {
     fun getAll(): Flux<Cart>
     fun getById(cartId: Long): Flux<Cart>
+    fun addItemToCart(cartId: Long, itemId: Long): Flux<CartItem>
 }
 
 @Repository
-class CartCustomRepositoryImpl(val dataBaseClient: DatabaseClient) : CartCustomRepository {
+class CartCustomRepositoryImpl(
+    private val dataBaseClient: DatabaseClient,
+    connectionFactory: ConnectionFactory
+) : CartCustomRepository {
+    private val r2dbcEntityTemplate = R2dbcEntityTemplate(connectionFactory)
+
     private val cartMapper: (t: MutableList<MutableMap<String, Any>>) -> Cart
         get() {
             val cartMapper: (t: MutableList<MutableMap<String, Any>>) -> Cart = { list ->
@@ -83,5 +95,36 @@ class CartCustomRepositoryImpl(val dataBaseClient: DatabaseClient) : CartCustomR
             .bufferUntilChanged {
                 it["cart_id"]
             }.map(cartMapper)
+    }
+
+    override fun addItemToCart(cartId: Long, itemId: Long): Flux<CartItem> {
+        return getById(cartId)
+            .switchIfEmpty(Mono.error(RuntimeException("[cart not founded $cartId]")))
+            .flatMap { cart ->
+                val cartItem = cart.cartItems?.firstOrNull { it.itemId == itemId } ?: CartItem(
+                    cartId = cartId,
+                    itemId = itemId,
+                    quantity = 0
+                )
+                cartItem.increment()
+                Mono.just(cartItem)
+            }.flatMap { cartItem ->
+                val id = cartItem.id
+                if (id != null) {
+                    r2dbcEntityTemplate.update(CartItem::class.java)
+                        .matching(
+                            org.springframework.data.relational.core.query.Query.query(
+                                Criteria.where("id").`is`(id)
+                            )
+                        )
+                        .apply(Update.update("quantity", cartItem.quantity))
+                        .flatMap {
+                            Mono.just(cartItem)
+                        }
+                } else {
+                    r2dbcEntityTemplate.insert(CartItem::class.java)
+                        .using(cartItem)
+                }
+            }
     }
 }
