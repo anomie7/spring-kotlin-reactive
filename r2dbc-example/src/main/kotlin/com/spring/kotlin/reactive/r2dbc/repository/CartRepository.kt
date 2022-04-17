@@ -25,7 +25,7 @@ interface CartRepository : ReactiveCrudRepository<Cart, Long>, CartCustomReposit
 interface CartCustomRepository {
     fun getAll(): Flux<Cart>
     fun getById(cartId: Long): Flux<Cart>
-    fun addItemToCart(cartId: Long, itemId: Long): Flux<CartItem>
+    fun addItemToCart(cartId: Long, item: Item): Flux<CartItem>
 }
 
 @Repository
@@ -97,15 +97,17 @@ class CartCustomRepositoryImpl(
             }.map(cartMapper)
     }
 
-    override fun addItemToCart(cartId: Long, itemId: Long): Flux<CartItem> {
+    override fun addItemToCart(cartId: Long, item: Item): Flux<CartItem> {
         return getById(cartId)
             .switchIfEmpty(Mono.error(RuntimeException("[cart not founded $cartId]")))
             .flatMap { cart ->
-                val cartItem = cart.cartItems?.firstOrNull { it.itemId == itemId } ?: CartItem(
-                    cartId = cartId,
-                    itemId = itemId,
-                    quantity = 0
-                )
+                val cartItem = cart.cartItems?.firstOrNull { it.itemId == item.id }
+                    ?: CartItem(
+                        cartId = cartId,
+                        itemId = item.id,
+                        quantity = 0,
+                        item = item
+                    )
                 cartItem.increment()
                 Mono.just(cartItem)
             }.flatMap { cartItem ->
