@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.ExampleMatcher
+import org.springframework.r2dbc.core.DatabaseClient
+import reactor.core.publisher.Flux
 import reactor.test.StepVerifier
 
 @SpringBootTest
@@ -15,6 +17,9 @@ class ItemRepositoryTests {
 
     @Autowired
     private lateinit var itemRepository: ItemRepository
+
+    @Autowired
+    private lateinit var dataBaseClient: DatabaseClient
 
     @Test
     fun saveTest() {
@@ -41,7 +46,7 @@ class ItemRepositoryTests {
     }
 
     @Test
-    fun testDynamicQueryByMatch() {
+    fun testDynamicQueryByMatcher() {
         val name = "IPhone"
         val price = 0.0
         val matcher = ExampleMatcher.matching()
@@ -56,5 +61,42 @@ class ItemRepositoryTests {
                 true
             }
             .verifyComplete()
+    }
+
+    @Test
+    fun testSearchByName() {
+        val item = Item(name = "IPhone", price = 0.0)
+        searchItem(item)
+            .`as`(StepVerifier::create)
+            .thenConsumeWhile {
+                true
+            }
+            .verifyComplete()
+    }
+
+    @Test
+    fun testSearchByPrice() {
+        val item = Item(name = "", price = 20.99)
+        searchItem(item)
+            .`as`(StepVerifier::create)
+            .thenConsumeWhile {
+                true
+            }
+            .verifyComplete()
+    }
+
+    fun searchItem(item: Item): Flux<MutableMap<String, Any>> {
+        var selectQuery = "SELECT * FROM item "
+        if (item.name.isNotEmpty() || item.price != 0.0) {
+            selectQuery += "WHERE "
+            if (item.name.isNotEmpty()) {
+                selectQuery += "item.name like '%${item.name}%'"
+            }
+
+            if (item.price != 0.0) {
+                selectQuery += "item.price = ${item.price}"
+            }
+        }
+        return dataBaseClient.sql(selectQuery).fetch().all()
     }
 }
