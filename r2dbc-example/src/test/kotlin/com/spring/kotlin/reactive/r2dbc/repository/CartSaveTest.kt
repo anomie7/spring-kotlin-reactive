@@ -2,6 +2,7 @@ package com.spring.kotlin.reactive.r2dbc.repository
 
 import com.spring.kotlin.reactive.r2dbc.entity.CartItem
 import com.spring.kotlin.reactive.r2dbc.entity.Item
+import com.spring.kotlin.reactive.r2dbc.service.CartService
 import io.r2dbc.spi.ConnectionFactory
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -12,15 +13,12 @@ import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query
 import org.springframework.data.relational.core.query.Update
 import org.springframework.r2dbc.core.DatabaseClient
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import java.lang.RuntimeException
 
 @SpringBootTest
 class CartSaveTest {
     @Autowired
-    private lateinit var cartRepository: CartRepository
+    private lateinit var cartService: CartService
 
     @Autowired
     private lateinit var itemRepository: ItemRepository
@@ -71,7 +69,7 @@ class CartSaveTest {
     fun addItemToCartTestWhenUpdate() {
         val cartId = 1L
         val itemId = 2L
-        cartRepository.addItemToCart(cartId, itemId)
+        cartService.addItem(cartId, itemId)
             .`as`(StepVerifier::create)
             .expectNextMatches {
                 Assertions.assertEquals(cartId, it.cartId)
@@ -80,7 +78,7 @@ class CartSaveTest {
                 true
             }.verifyComplete()
 
-        cartRepository.getById(cartId)
+        cartService.getById(cartId)
             .`as`(StepVerifier::create)
             .expectNextMatches { cart ->
                 val cartItem = cart.cartItems?.firstOrNull { it.itemId == itemId }
@@ -94,7 +92,8 @@ class CartSaveTest {
     fun addItemToCartTestWhenCreate() {
         val cartId: Long = 1
         val itemId: Long = 3
-        cartRepository.addItemToCart(cartId, itemId)
+
+        cartService.addItem(cartId, itemId)
             .`as`(StepVerifier::create)
             .expectNextMatches {
                 Assertions.assertEquals(cartId, it.cartId)
@@ -104,7 +103,7 @@ class CartSaveTest {
             }
             .verifyComplete()
 
-        cartRepository.getById(cartId)
+        cartService.getById(cartId)
             .`as`(StepVerifier::create)
             .expectNextMatches { cart ->
                 val cartItem = cart.cartItems?.firstOrNull { it.itemId == itemId }

@@ -21,3 +21,6 @@
 
 ## kotlin에서 @Transient 안먹는 이슈
 - https://github.com/spring-projects/spring-data-r2dbc/issues/449
+
+## 다이나믹 쿼리
+- [Spring Data R2DBC - Query-by-Example (QBE) example](https://github.com/spring-projects/spring-data-examples/tree/main/r2dbc/query-by-example)

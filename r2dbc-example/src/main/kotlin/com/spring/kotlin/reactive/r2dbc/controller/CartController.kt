@@ -2,14 +2,10 @@ package com.spring.kotlin.reactive.r2dbc.controller
 
 import com.spring.kotlin.reactive.r2dbc.entity.Cart
 import com.spring.kotlin.reactive.r2dbc.entity.CartItem
-import com.spring.kotlin.reactive.r2dbc.repository.CartRepository
-import com.spring.kotlin.reactive.r2dbc.repository.ItemRepository
 import com.spring.kotlin.reactive.r2dbc.service.CartService
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import java.lang.RuntimeException
 
 @RestController
 class CartController(val cartService: CartService) {
@@ -31,6 +27,6 @@ class CartController(val cartService: CartService) {
 
     @PostMapping("v1/carts/{id}/add/{itemId}")
     fun addItem(@PathVariable("id") cartId: Long, @PathVariable("itemId") itemId: Long): Flux<CartItem> {
-        return cartService.addToITem(cartId, itemId)
+        return cartService.addItem(cartId, itemId)
     }
 }

@@ -22,7 +22,7 @@ class CartService(
         return cartRepository.getById(cartId)
     }
 
-    fun addToITem(cartId: Long, itemId: Long): Flux<CartItem> {
+    fun addItem(cartId: Long, itemId: Long): Flux<CartItem> {
         return itemRepository.findById(itemId)
             .switchIfEmpty(Mono.error(RuntimeException("item not founded $itemId")))
             .flatMapMany { item ->
