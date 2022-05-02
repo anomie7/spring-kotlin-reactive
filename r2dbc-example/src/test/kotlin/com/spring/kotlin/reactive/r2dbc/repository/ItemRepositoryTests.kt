@@ -65,10 +65,13 @@ class ItemRepositoryTests {
 
     @Test
     fun testSearchByName() {
-        val item = Item(name = "IPhone", price = 0.0)
-        searchItem(item)
+        val iphone = "IPhone"
+        val item = Item(name = iphone, price = 0.0)
+        itemRepository.searchItem(item)
             .`as`(StepVerifier::create)
             .thenConsumeWhile {
+                val name = it["name"] as String
+                Assertions.assertTrue(name.contains(iphone))
                 true
             }
             .verifyComplete()
@@ -76,27 +79,31 @@ class ItemRepositoryTests {
 
     @Test
     fun testSearchByPrice() {
-        val item = Item(name = "", price = 20.99)
-        searchItem(item)
+        val price = 20.99
+        val item = Item(name = "", price = price)
+        itemRepository.searchItem(item)
             .`as`(StepVerifier::create)
             .thenConsumeWhile {
+                Assertions.assertEquals(it["price"] as Double, price)
                 true
             }
             .verifyComplete()
     }
 
-    fun searchItem(item: Item): Flux<MutableMap<String, Any>> {
-        var selectQuery = "SELECT * FROM item "
-        if (item.name.isNotEmpty() || item.price != 0.0) {
-            selectQuery += "WHERE "
-            if (item.name.isNotEmpty()) {
-                selectQuery += "item.name like '%${item.name}%'"
+    @Test
+    fun testSearchByNameAndPrice() {
+        val iphone = "IPhone"
+        val price = 20.99
+        val item = Item(name = iphone, price = price)
+        itemRepository.searchItem(item)
+            .`as`(StepVerifier::create)
+            .thenConsumeWhile {
+                val name = it["name"] as String
+                Assertions.assertTrue(name.contains(iphone))
+                Assertions.assertEquals(it["price"] as Double, price)
+                true
             }
-
-            if (item.price != 0.0) {
-                selectQuery += "item.price = ${item.price}"
-            }
-        }
-        return dataBaseClient.sql(selectQuery).fetch().all()
+            .verifyComplete()
     }
+
 }

@@ -12,9 +12,6 @@ class CartRepositoryTest {
     @Autowired
     private lateinit var cartRepository: CartRepository
 
-    @Autowired
-    private lateinit var dataBaseClient: DatabaseClient
-
     @Test
     fun getAllTest() {
         cartRepository.getAll()
