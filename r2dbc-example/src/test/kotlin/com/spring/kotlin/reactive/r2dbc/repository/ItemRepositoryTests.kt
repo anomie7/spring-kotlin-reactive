@@ -18,9 +18,6 @@ class ItemRepositoryTests {
     @Autowired
     private lateinit var itemRepository: ItemRepository
 
-    @Autowired
-    private lateinit var dataBaseClient: DatabaseClient
-
     @Test
     fun saveTest() {
         val item = Item(name = "컴퓨터", price = 1000.22)
@@ -65,13 +62,13 @@ class ItemRepositoryTests {
 
     @Test
     fun testSearchByName() {
-        val iphone = "IPhone"
+        val iphone = "IPHONE"
         val item = Item(name = iphone, price = 0.0)
         itemRepository.searchItem(item)
             .`as`(StepVerifier::create)
             .thenConsumeWhile {
                 val name = it["name"] as String
-                Assertions.assertTrue(name.contains(iphone))
+                Assertions.assertTrue(name.uppercase().contains(iphone.uppercase()))
                 true
             }
             .verifyComplete()
@@ -92,14 +89,14 @@ class ItemRepositoryTests {
 
     @Test
     fun testSearchByNameAndPrice() {
-        val iphone = "IPhone"
+        val iphone = "iphone"
         val price = 20.99
         val item = Item(name = iphone, price = price)
         itemRepository.searchItem(item)
             .`as`(StepVerifier::create)
             .thenConsumeWhile {
                 val name = it["name"] as String
-                Assertions.assertTrue(name.contains(iphone))
+                Assertions.assertTrue(name.uppercase().contains(iphone.uppercase()))
                 Assertions.assertEquals(it["price"] as Double, price)
                 true
             }

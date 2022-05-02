@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 
 @Repository
-interface ItemRepository : ReactiveCrudRepository<Item, Long>, ReactiveQueryByExampleExecutor<Item>, ItemCustomRepository
+interface ItemRepository : ReactiveCrudRepository<Item, Long>, ReactiveQueryByExampleExecutor<Item>,
+    ItemCustomRepository
 
 interface ItemCustomRepository {
     fun searchItem(item: Item): Flux<MutableMap<String, Any>>
@@ -20,20 +21,16 @@ class ItemCustomRepositoryImpl(
 ) : ItemCustomRepository {
     override fun searchItem(item: Item): Flux<MutableMap<String, Any>> {
         var selectQuery = "SELECT * FROM item "
-        if (item.name.isNotEmpty() && item.price != 0.0) {
-            selectQuery += "WHERE "
-            selectQuery += "item.name like '%${item.name}%'"
-            selectQuery += " AND "
-            selectQuery += "item.price = ${item.price}"
-        } else if (item.name.isNotEmpty() || item.price != 0.0) {
-            selectQuery += "WHERE "
+        val whereClause = mutableListOf<String>()
+        if (item.name.isNotEmpty() || item.price != 0.0) {
             if (item.name.isNotEmpty()) {
-                selectQuery += "item.name like '%${item.name}%'"
+                whereClause.add("UPPER(item.name) like UPPER('%${item.name}%')")
             }
 
             if (item.price != 0.0) {
-                selectQuery += "item.price = ${item.price}"
+                whereClause.add("item.price = ${item.price}")
             }
+            selectQuery += whereClause.joinToString(" AND ", "WHERE ")
         }
         return dataBaseClient.sql(selectQuery).fetch().all()
     }
