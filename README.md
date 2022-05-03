@@ -24,3 +24,6 @@
 
 ## 다이나믹 쿼리
 - [Spring Data R2DBC - Query-by-Example (QBE) example](https://github.com/spring-projects/spring-data-examples/tree/main/r2dbc/query-by-example)
+
+## batching
+- https://r2dbc.io/spec/1.0.0.RELEASE/spec/html/#statements.batching

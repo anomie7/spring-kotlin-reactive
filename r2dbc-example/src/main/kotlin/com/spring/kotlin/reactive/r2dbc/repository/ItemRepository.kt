@@ -45,8 +45,8 @@ class ItemCustomRepositoryImpl(
                 statement.bind(0, item.name).bind(1, item.price).add()
             }
             Flux.from(statement.execute()).flatMap { result ->
-                result.map { t, r ->
-                    Item(t["id"] as Long, t["name"] as String, t["price"] as Double)
+                result.map { row, r ->
+                    Item(row["id"] as Long, row["name"] as String, row["price"] as Double)
                 }
             }
         }
