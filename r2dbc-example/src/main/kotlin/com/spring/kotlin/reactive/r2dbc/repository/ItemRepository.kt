@@ -13,6 +13,7 @@ interface ItemRepository : ReactiveCrudRepository<Item, Long>, ReactiveQueryByEx
 
 interface ItemCustomRepository {
     fun searchItem(item: Item): Flux<MutableMap<String, Any>>
+    fun batchSave(items: List<Item>): Flux<Item>
 }
 
 @Repository
@@ -33,5 +34,21 @@ class ItemCustomRepositoryImpl(
             selectQuery += whereClause.joinToString(" AND ", "WHERE ")
         }
         return dataBaseClient.sql(selectQuery).fetch().all()
+    }
+
+    override fun batchSave(items: List<Item>): Flux<Item> {
+        return dataBaseClient.inConnectionMany { connection ->
+            val statement =
+                connection.createStatement("INSERT INTO item(name, price) VALUES ($1, $2)")
+                    .returnGeneratedValues("id", "name", "price")
+            for (item in items) {
+                statement.bind(0, item.name).bind(1, item.price).add()
+            }
+            Flux.from(statement.execute()).flatMap { result ->
+                result.map { t, r ->
+                    Item(t["id"] as Long, t["name"] as String, t["price"] as Double)
+                }
+            }
+        }
     }
 }

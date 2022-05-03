@@ -73,7 +73,7 @@ class ItemSaveTest {
     fun batchSaveTest() {
         val item1 = Item(name = "배치 아이템1", price = 101.0)
         val item2 = Item(name = "배치 아이템2", price = 141.0)
-        batchSave(listOf(item1, item2))
+        itemRepository.batchSave(listOf(item1, item2))
             .`as`(StepVerifier::create)
             .thenConsumeWhile {
                 println("item save success: $it")
@@ -81,19 +81,4 @@ class ItemSaveTest {
             }.verifyComplete()
     }
 
-    fun batchSave(items: List<Item>): Flux<Item> {
-        return dataBaseClient.inConnectionMany { connection ->
-            val statement =
-                connection.createStatement("INSERT INTO item(name, price) VALUES ($1, $2)")
-                    .returnGeneratedValues("id", "name", "price")
-            for (item in items) {
-                statement.bind(0, item.name).bind(1, item.price).add()
-            }
-            Flux.from(statement.execute()).flatMap { result ->
-                result.map { t, r ->
-                    Item(t["id"] as Long, t["name"] as String, t["price"] as Double)
-                }
-            }
-        }
-    }
 }
