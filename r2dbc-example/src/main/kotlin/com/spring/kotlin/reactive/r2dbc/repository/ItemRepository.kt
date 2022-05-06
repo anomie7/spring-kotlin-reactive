@@ -1,15 +1,24 @@
 package com.spring.kotlin.reactive.r2dbc.repository
 
 import com.spring.kotlin.reactive.r2dbc.entity.Item
+import org.springframework.data.r2dbc.repository.Modifying
+import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
 
 @Repository
 interface ItemRepository : ReactiveCrudRepository<Item, Long>, ReactiveQueryByExampleExecutor<Item>,
-    ItemCustomRepository
+    ItemCustomRepository {
+
+    @Modifying
+    @Query("UPDATE item SET name = :name, price = :price where id = :id")
+    fun updateItem(name: String, price: Double, id: Long): Mono<Int?>
+}
 
 interface ItemCustomRepository {
     fun searchItem(item: Item): Flux<MutableMap<String, Any>>

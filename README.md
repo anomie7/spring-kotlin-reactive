@@ -27,3 +27,6 @@
 
 ## batching
 - https://r2dbc.io/spec/1.0.0.RELEASE/spec/html/#statements.batching
+
+## Fluent Api multiple columns update
+- https://github.com/spring-projects/spring-data-r2dbc/issues/195
