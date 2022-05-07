@@ -1,9 +1,7 @@
 package com.spring.kotlin.reactive.r2dbc.repository
 
-import com.spring.kotlin.reactive.r2dbc.entity.CartItem
 import com.spring.kotlin.reactive.r2dbc.entity.Item
 import io.r2dbc.spi.ConnectionFactory
-import io.r2dbc.spi.Result
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,8 +10,6 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query
 import org.springframework.data.relational.core.query.Update
-import org.springframework.r2dbc.core.DatabaseClient
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 
@@ -24,9 +20,6 @@ class ItemUpdateTest {
 
     @Autowired
     private lateinit var connectionFactory: ConnectionFactory
-
-    @Autowired
-    private lateinit var dataBaseClient: DatabaseClient
 
     @Test
     fun updateByRepositoryTest() {
