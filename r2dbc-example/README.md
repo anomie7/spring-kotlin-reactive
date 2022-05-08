@@ -667,8 +667,24 @@ class ItemUpdateTest {
 - [batching](https://r2dbc.io/spec/1.0.0.RELEASE/spec/html/#statements.batching)
 - [Fluent Api multiple columns update](https://github.com/spring-projects/spring-data-r2dbc/issues/195)
 - https://docs.spring.io/spring-data/r2dbc/docs/1.2.2/reference/html/#r2dbc.entityoperations.fluent-api.insert
-### 4. 연관 관계 구현하기
+----
+이전글 : [[리액티브 코프링] R2DBC 사용법 ((데이터 저장 & 수정)](https://anomie7.tistory.com/94)
 
+> 모든 예제 코드는 필자의 [github 레포지토리](https://github.com/anomie7/spring-kotlin-reactive/tree/master/r2dbc-example) 에서 확인할 수 있다.
+### 4. 연관 관계 구현하기
+#### 도메인 & 요구사항
+본 예제에서는 [스프링 부트 실전 활용 마스터](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=271824446) 의 장바구니 예제를 차용하고 있다.   
+Cart, CartItem, Item 엔티티를 사용하고 있으며 연관 관계는 아래와 같다.   
+<br>
+![도메인 연관관계](https://github.com/anomie7/spring-kotlin-reactive/blob/master/images/Untitled%20Diagram.drawio.png?raw=true)
+<br>
+Cart와 CartItem은 1대 N 연관관계이고, CartItem과 Item은 일대일 연관관계이다.
+
+#### 엔티티 설정 (Transient)
+
+#### 조회
+
+### 저장
 ### 
 
 
