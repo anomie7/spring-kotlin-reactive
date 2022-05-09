@@ -24,6 +24,7 @@ INSERT INTO item(name, price) VALUES ('IPhone 15', 20.99);
 
 INSERT INTO cart(id) VALUES (1);
 INSERT INTO cart(id) VALUES (2);
+INSERT INTO cart(id) VALUES (3);
 INSERT INTO cart_item(quantity, cart_id, item_id) VALUES (4, 1, 1);
 INSERT INTO cart_item(quantity, cart_id, item_id) VALUES (4, 1, 2);
 INSERT INTO cart_item(quantity, cart_id, item_id) VALUES (4, 1, 5);
